@@ -4,6 +4,11 @@ import json
 import csv
 import io
 import logging
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 
 from difficulty_framework import generate_difficulty_report
 from parallel_implementation import parallel_assess_difficulty
