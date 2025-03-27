@@ -3,3 +3,4 @@ anthropic
 matplotlib
 numpy
 pandas
+dotenv
