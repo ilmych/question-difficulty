@@ -1,2 +1,5 @@
 streamlit
 anthropic
+matplotlib
+numpy
+pandas
