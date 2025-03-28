@@ -21,7 +21,8 @@ def parallel_assess_difficulty(
     questions: List[Dict[str, Any]],
     client=None,
     max_workers: int = 5,
-    show_progress: bool = True
+    show_progress: bool = True,
+    use_cache: bool = True  # Add this parameter
 ) -> Dict[str, Any]:
     """
     A drop-in replacement for the existing question assessment function
@@ -32,11 +33,25 @@ def parallel_assess_difficulty(
         client: LLM client to use for API calls
         max_workers: Maximum number of parallel workers to use
         show_progress: Whether to show progress bars
+        use_cache: Whether to use caching for LLM responses
         
     Returns:
         Assessment results dictionary with the same structure
         as the sequential version
     """
+    # Enable cache if requested
+    if use_cache and 'CACHE_AVAILABLE' in globals() and globals()['CACHE_AVAILABLE']:
+        logger.info("LLM response caching enabled")
+        
+        # Initialize the cache with default settings
+        from cache_manager import get_cache
+        cache = get_cache()
+        
+        # Print cache status
+        if cache and cache.enabled:
+            stats = cache.get_stats()
+            logger.info(f"Cache initialized: {stats}")
+            
     from difficulty_framework import (
         aggregate_knowledge_requirements,
         aggregate_cognitive_complexity,
