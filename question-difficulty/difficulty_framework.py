@@ -2970,7 +2970,7 @@ def determine_difficulty_level(score):
     return "Unknown"
 
 # Output and Visualization Functions
-def generate_difficulty_report(question_results, overall_result, output_format="markdown", output_file=None):
+def generate_difficulty_report(question_results, overall_result, output_format="markdown", output_file=None, metadata):
     """
     Generate a comprehensive difficulty report for question assessment results.
     
