@@ -1838,7 +1838,7 @@ def assess_context_difficulty(question_text, passage_text, client=None):
                 "difficulty_score": difficulty_score,
                 "binary_score": binary_score,
                 "category_scores": overall_scores[0].get("category_scores", {}),
-                "explanation": f"Passage difficulty score is {overall_difficulty:.2f}/10, which is "
+                "explanation": f"Passage difficulty score is {difficulty_score:.2f}/10, which is "
                                f"{'above' if binary_score == 1 else 'below'} the threshold of 6.5."
             }
             
@@ -2046,7 +2046,7 @@ def evaluate_visual_aids(question_data):
     30% of question structure and format score"""
     # Convert to lowercase for case-insensitive matching
     question_text = question_data["question"]
-    passage_text = question_data.get["passage"]
+    passage_text = question_data.get("passage")
     text_lower = text_lower = (passage_text + ", " + question_text).lower()
     
     # Check for references to visual elements in the question text
