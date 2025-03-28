@@ -394,10 +394,10 @@ def aggregate_knowledge_requirements(question_data, client=None):
     
     # Get scores for each component (placeholders)
     prior_knowledge_score, prior_knowledge_details = evaluate_prior_knowledge(question_data, client)
-    domain_specific_score, domain_specific_details = evaluate_domain_specific(question_text, client)
-    knowledge_level_score, knowledge_level_details = evaluate_knowledge_level(question_text, client)
-    concept_abstractness_score, concept_abstractness_details = evaluate_concept_abstractness(question_text, client)
-    specialized_terminology_score, specialized_terminology_details = evaluate_specialized_terminology(question_text)
+    domain_specific_score, domain_specific_details = evaluate_domain_specific(question_data, client)
+    knowledge_level_score, knowledge_level_details = evaluate_knowledge_level(question_data, client)
+    concept_abstractness_score, concept_abstractness_details = evaluate_concept_abstractness(question_data, client)
+    specialized_terminology_score, specialized_terminology_details = evaluate_specialized_terminology(question_data)
     
     # Store all component results
     component_results = {
@@ -534,7 +534,7 @@ Focus your evaluation specifically on the prior knowledge requirement, not other
         }
 
 @requires_client
-def evaluate_domain_specific(question_text, client=None):
+def evaluate_domain_specific(question_data, client=None):
     """
     Evaluate if the knowledge required is domain-specific or general.
     Uses an LLM to determine if specialized domain knowledge is needed (hard) or if general knowledge is sufficient (easy).
@@ -553,6 +553,18 @@ def evaluate_domain_specific(question_text, client=None):
     # Return placeholder values if client is None (for testing)
     if client is None:
         return 0, {"explanation": "Client not provided, returning default score"}
+
+    question_text = question_data["question"]
+    passage_text = question_data.get("passage", "")
+    options = question_data.get("options", [])
+    
+    # Format options string if present
+    options_text = ""
+    if options:
+        if isinstance(options, list):
+            options_text = "\nOptions:\n" + "\n".join([f"- {opt}" for opt in options])
+        elif isinstance(options, dict):
+            options_text = "\nOptions:\n" + "\n".join([f"- {k}: {v}" for k, v in options.items()])
     
     # Construct prompt for the LLM
     prompt = f"""
@@ -578,6 +590,8 @@ HARD (Score 1):
 Please analyze the following question:
 
 QUESTION: {question_text}
+{f"PASSAGE: {passage_text}" if passage_text else ""}
+{options_text}
 
 Provide your assessment in JSON format with the following structure:
 ```json
@@ -620,7 +634,7 @@ Focus your evaluation specifically on whether the knowledge is general or domain
     }
 
 @requires_client
-def evaluate_knowledge_level(question_text, client=None):
+def evaluate_knowledge_level(question_data, client=None):
     """
     Evaluate what level of subject knowledge is required to answer the question.
     Uses an LLM to determine if basic knowledge is sufficient (easy) or if advanced knowledge is required (hard).
@@ -639,6 +653,18 @@ def evaluate_knowledge_level(question_text, client=None):
     # Return placeholder values if client is None (for testing)
     if client is None:
         return 0, {"explanation": "Client not provided, returning default score"}
+
+    question_text = question_data["question"]
+    passage_text = question_data.get("passage", "")
+    options = question_data.get("options", [])
+    
+    # Format options string if present
+    options_text = ""
+    if options:
+        if isinstance(options, list):
+            options_text = "\nOptions:\n" + "\n".join([f"- {opt}" for opt in options])
+        elif isinstance(options, dict):
+            options_text = "\nOptions:\n" + "\n".join([f"- {k}: {v}" for k, v in options.items()])
     
     # Construct prompt for the LLM
     prompt = f"""
@@ -667,6 +693,8 @@ HARD (Score 1):
 Please analyze the following question:
 
 QUESTION: {question_text}
+{f"PASSAGE: {passage_text}" if passage_text else ""}
+{options_text}
 
 Provide your assessment in JSON format with the following structure:
 ```json
@@ -710,7 +738,7 @@ Focus your evaluation specifically on the level of subject knowledge required, n
         }
 
 @requires_client
-def evaluate_concept_abstractness(question_text, client=None):
+def evaluate_concept_abstractness(question_data, client=None):
     """
     Evaluate if the concepts involved in the question are abstract/complex or concrete/straightforward.
     Uses an LLM to determine if concepts are concrete (easy) or abstract (hard).
@@ -729,6 +757,18 @@ def evaluate_concept_abstractness(question_text, client=None):
     # Return placeholder values if client is None (for testing)
     if client is None:
         return 0, {"explanation": "Client not provided, returning default score"}
+
+    question_text = question_data["question"]
+    passage_text = question_data.get("passage", "")
+    options = question_data.get("options", [])
+    
+    # Format options string if present
+    options_text = ""
+    if options:
+        if isinstance(options, list):
+            options_text = "\nOptions:\n" + "\n".join([f"- {opt}" for opt in options])
+        elif isinstance(options, dict):
+            options_text = "\nOptions:\n" + "\n".join([f"- {k}: {v}" for k, v in options.items()])
     
     # Construct prompt for the LLM
     prompt = f"""
@@ -758,6 +798,8 @@ HARD (Score 1):
 Please analyze the following question:
 
 QUESTION: {question_text}
+{f"PASSAGE: {passage_text}" if passage_text else ""}
+{options_text}
 
 Provide your assessment in JSON format with the following structure:
 ```json
@@ -889,9 +931,9 @@ def aggregate_cognitive_complexity(question_data, client=None):
     
     # Get scores for each component (placeholders)
     thinking_score, thinking_details = evaluate_thinking_requirements(question_data, client)
-    cognitive_level_score, cognitive_level_details = estimate_cognitive_level(question_text, client)
-    problem_complexity_score, problem_complexity_details = evaluate_problem_complexity(question_text, client)
-    cognitive_bias_score, cognitive_bias_details = evaluate_cognitive_bias(question_text, client)
+    cognitive_level_score, cognitive_level_details = estimate_cognitive_level(question_data, client)
+    problem_complexity_score, problem_complexity_details = evaluate_problem_complexity(question_data, client)
+    cognitive_bias_score, cognitive_bias_details = evaluate_cognitive_bias(question_data, client)
     
     # Store all component results
     component_results = {
@@ -1029,7 +1071,7 @@ Focus your evaluation specifically on the thinking skills required, not other as
         }
 
 @requires_client
-def estimate_cognitive_level(question_text, client=None):
+def estimate_cognitive_level(question_data, client=None):
     """
     Estimate what cognitive process is required to answer the question.
     Uses an LLM to determine if lower-order cognitive processes (recall, comprehension) suffice (easy)
@@ -1049,6 +1091,18 @@ def estimate_cognitive_level(question_text, client=None):
     # Return placeholder values if client is None (for testing)
     if client is None:
         return 0, {"explanation": "Client not provided, returning default score"}
+
+    question_text = question_data["question"]
+    passage_text = question_data.get("passage", "")
+    options = question_data.get("options", [])
+    
+    # Format options string if present
+    options_text = ""
+    if options:
+        if isinstance(options, list):
+            options_text = "\nOptions:\n" + "\n".join([f"- {opt}" for opt in options])
+        elif isinstance(options, dict):
+            options_text = "\nOptions:\n" + "\n".join([f"- {k}: {v}" for k, v in options.items()])
     
     # Construct prompt for the LLM
     prompt = f"""
@@ -1078,6 +1132,8 @@ HARD (Score 1) - Higher-order thinking:
 Please analyze the following question:
 
 QUESTION: {question_text}
+{f"PASSAGE: {passage_text}" if passage_text else ""}
+{options_text}
 
 Provide your assessment in JSON format with the following structure:
 ```json
@@ -1121,7 +1177,7 @@ Focus your evaluation specifically on the cognitive process level required, not 
         }
 
 @requires_client
-def evaluate_problem_complexity(question_text, client=None):
+def evaluate_problem_complexity(question_data, client=None):
     """
     Evaluate if the question involves a straightforward problem or a complex, open-ended one.
     Uses an LLM to determine if the problem is simple and singular (easy) or complex and multi-faceted (hard).
@@ -1140,6 +1196,18 @@ def evaluate_problem_complexity(question_text, client=None):
     # Return placeholder values if client is None (for testing)
     if client is None:
         return 0, {"explanation": "Client not provided, returning default score"}
+
+    question_text = question_data["question"]
+    passage_text = question_data.get("passage", "")
+    options = question_data.get("options", [])
+    
+    # Format options string if present
+    options_text = ""
+    if options:
+        if isinstance(options, list):
+            options_text = "\nOptions:\n" + "\n".join([f"- {opt}" for opt in options])
+        elif isinstance(options, dict):
+            options_text = "\nOptions:\n" + "\n".join([f"- {k}: {v}" for k, v in options.items()])
     
     # Construct prompt for the LLM
     prompt = f"""
@@ -1170,6 +1238,8 @@ HARD (Score 1):
 Please analyze the following question:
 
 QUESTION: {question_text}
+{f"PASSAGE: {passage_text}" if passage_text else ""}
+{options_text}
 
 Provide your assessment in JSON format with the following structure:
 ```json
@@ -1214,7 +1284,7 @@ Focus your evaluation specifically on the problem complexity, not other aspects 
         }
 
 @requires_client
-def evaluate_cognitive_bias(question_text, client=None):
+def evaluate_cognitive_bias(question_data, client=None):
     """
     Evaluate if there are cognitive biases or misconceptions that could affect the test-taker's response.
     Uses an LLM to determine if the question is relatively free from bias triggers (easy) or likely to 
@@ -1234,6 +1304,18 @@ def evaluate_cognitive_bias(question_text, client=None):
     # Return placeholder values if client is None (for testing)
     if client is None:
         return 0, {"explanation": "Client not provided, returning default score"}
+
+    question_text = question_data["question"]
+    passage_text = question_data.get("passage", "")
+    options = question_data.get("options", [])
+    
+    # Format options string if present
+    options_text = ""
+    if options:
+        if isinstance(options, list):
+            options_text = "\nOptions:\n" + "\n".join([f"- {opt}" for opt in options])
+        elif isinstance(options, dict):
+            options_text = "\nOptions:\n" + "\n".join([f"- {k}: {v}" for k, v in options.items()])
     
     # Construct prompt for the LLM
     prompt = f"""
@@ -1262,6 +1344,8 @@ HARD (Score 1):
 Please analyze the following question:
 
 QUESTION: {question_text}
+{f"PASSAGE: {passage_text}" if passage_text else ""}
+{options_text}
 
 Provide your assessment in JSON format with the following structure:
 ```json
@@ -1787,9 +1871,9 @@ def aggregate_question_structure(question_data, client=None):
     question_text = question_data["question"]
     
     # Get scores for each component (placeholders)
-    format_score, format_details = evaluate_question_format(question_text)
-    visual_score, visual_details = evaluate_visual_aids(question_text)
-    clarity_score, clarity_details = evaluate_question_clarity(question_text, client)
+    format_score, format_details = evaluate_question_format(question_data)
+    visual_score, visual_details = evaluate_visual_aids(question_data)
+    clarity_score, clarity_details = evaluate_question_clarity(question_data, client)
     
     # Store all component results
     component_results = {
@@ -1815,28 +1899,21 @@ def aggregate_question_structure(question_data, client=None):
     
     return weighted_score, component_results
 
-def evaluate_question_format(question_text):
+def evaluate_question_format(question_data):
     """Evaluate what question format is used (mcq, open ended, true/false, etc.). (Algorithm)
     40% of question structure and format score"""
+    question_text = question_data["question"]
+    passage_text = question_data.get("passage", "")
+    options = question_data.get("options", [])
+            
     # Convert to lowercase for case-insensitive matching
     text_lower = question_text.lower()
     
-    # Check for multiple choice indicators
-    multiple_choice_patterns = [
-        r'\([a-e]\)', r'[a-e]\)', r'[a-e]\.',  # (a), a), a.
-        r'choose.*following', r'select.*option',
-        r'which of the following', r'which one of these'
-    ]
-    
-    is_multiple_choice = any(re.search(pattern, text_lower) for pattern in multiple_choice_patterns)
+    # Check for multiple choice indicators   
+    is_multiple_choice = isinstance(options, (list, dict)) and len(options) > 2
     
     # Check for true/false format
-    true_false_patterns = [
-        r'true or false', r'true/false', r't/f', r'(t|f)',
-        r'indicate whether.*true.*false'
-    ]
-    
-    is_true_false = any(re.search(pattern, text_lower) for pattern in true_false_patterns)
+    is_true_false = isinstance(options, (list, dict)) and len(options) == 2 and any(x == "True" or (isinstance(x, str) and re.match(r"(?i)^yes", x.strip())) for x in (options if isinstance(options, list) else options.values())
     
     # Check for matching format
     matching_patterns = [
@@ -1957,14 +2034,16 @@ def evaluate_question_format(question_text):
         "is_essay": is_essay
     }
 
-def evaluate_visual_aids(question_text):
+def evaluate_visual_aids(question_data):
     """Evaluate whether visual aids are effectively used. (Algorithm)
     30% of question structure and format score"""
     # Convert to lowercase for case-insensitive matching
-    text_lower = question_text.lower()
+    question_text = question_data["question"]
+    passage_text = question_data.get["passage"]
+    text_lower = text_lower = (passage_text + ", " + question_text).lower()
     
     # Check for references to visual elements in the question text
-    image_references = bool(re.search(r'\b(figure|image|picture|photo|illustration)\b', text_lower))
+    image_references = bool(re.search(r'\b(figure|image|picture|photo|illustration|<img>)\b', text_lower))
     table_references = bool(re.search(r'\b(table|tabular data|row|column|cell)\b', text_lower))
     chart_references = bool(re.search(r'\b(chart|graph|plot|histogram|bar chart|pie chart|line graph)\b', text_lower))
     diagram_references = bool(re.search(r'\b(diagram|schematic|flowchart|map|blueprint)\b', text_lower))
@@ -1981,9 +2060,9 @@ def evaluate_visual_aids(question_text):
     
     # Look for phrases that indicate whether visual analysis is required
     requires_visual_interpretation = bool(re.search(
-        r'\b(shown|displayed|depicted|illustrated|presented|according to|based on|refer to|'
-        r'observe|examine|from the|as seen in|interpret|analyze|identify|label|compare|'
-        r'trend|pattern|locate|find in|point|mark)\b', 
+        r'\b(shown|displayed|depicted|illustrated|presented|'
+        r'interpret|analyze|identify|label|'
+        r'trend|pattern|point|mark)\b', 
         text_lower
     ))
     
@@ -2009,8 +2088,8 @@ def evaluate_visual_aids(question_text):
     
     # Questions with phrases explicitly directing attention to visuals likely have them
     has_directive_phrases = bool(re.search(
-        r'(look at|refer to|examine|based on|according to|shown in|observe|review|'
-        r'analyze|study|as seen in)(.*?)(figure|image|table|chart|graph|diagram)',
+        r'(look at|refer to|examine|'
+        r'as seen in)(.*?)(figure|image|table|chart|graph|diagram)',
         text_lower
     ))
     
@@ -2046,7 +2125,7 @@ def evaluate_visual_aids(question_text):
     }
 
 @requires_client
-def evaluate_question_clarity(question_text, client=None):
+def evaluate_question_clarity(question_data, client=None):
     """
     Evaluate whether the question is clear and concise, or ambiguous and open to multiple interpretations.
     Uses an LLM to determine if the question is clearly phrased (easy) or ambiguously phrased (hard).
@@ -2065,6 +2144,18 @@ def evaluate_question_clarity(question_text, client=None):
     # Return placeholder values if client is None (for testing)
     if client is None:
         return 0, {"explanation": "Client not provided, returning default score"}
+
+    question_text = question_data["question"]
+    passage_text = question_data.get("passage", "")
+    options = question_data.get("options", [])
+    
+    # Format options string if present
+    options_text = ""
+    if options:
+        if isinstance(options, list):
+            options_text = "\nOptions:\n" + "\n".join([f"- {opt}" for opt in options])
+        elif isinstance(options, dict):
+            options_text = "\nOptions:\n" + "\n".join([f"- {k}: {v}" for k, v in options.items()])
     
     # Construct prompt for the LLM
     prompt = f"""
@@ -2094,6 +2185,8 @@ HARD (Score 1):
 Please analyze the following question:
 
 QUESTION: {question_text}
+{f"PASSAGE: {passage_text}" if passage_text else ""}
+{options_text}
 
 Provide your assessment in JSON format with the following structure:
 ```json
@@ -2150,8 +2243,8 @@ def aggregate_linguistic_factors(question_data, client=None):
     
     # Get scores for each component (placeholders)
     language_complexity_score, language_complexity_details = evaluate_language_complexity(question_text, target_grade)
-    term_clarity_score, term_clarity_details = evaluate_term_clarity(question_text, client)
-    cultural_references_score, cultural_references_details = evaluate_cultural_references(question_text, client)
+    term_clarity_score, term_clarity_details = evaluate_term_clarity(question_data, client)
+    cultural_references_score, cultural_references_details = evaluate_cultural_references(question_data, client)
     
     # Store all component results
     component_results = {
@@ -2278,7 +2371,7 @@ def evaluate_language_complexity(question_text, target_grade):
     }
 
 @requires_client
-def evaluate_term_clarity(question_text, client=None):
+def evaluate_term_clarity(question_data, client=None):
     """
     Evaluate whether the terms and concepts used in the question are clearly defined and understood.
     Uses an LLM to determine if terms are clear and well-defined (easy) or undefined and ambiguous (hard).
@@ -2297,6 +2390,18 @@ def evaluate_term_clarity(question_text, client=None):
     # Return placeholder values if client is None (for testing)
     if client is None:
         return 0, {"explanation": "Client not provided, returning default score"}
+
+    question_text = question_data["question"]
+    passage_text = question_data.get("passage", "")
+    options = question_data.get("options", [])
+    
+    # Format options string if present
+    options_text = ""
+    if options:
+        if isinstance(options, list):
+            options_text = "\nOptions:\n" + "\n".join([f"- {opt}" for opt in options])
+        elif isinstance(options, dict):
+            options_text = "\nOptions:\n" + "\n".join([f"- {k}: {v}" for k, v in options.items()])
     
     # Construct prompt for the LLM
     prompt = f"""
@@ -2326,6 +2431,8 @@ HARD (Score 1):
 Please analyze the following question:
 
 QUESTION: {question_text}
+{f"PASSAGE: {passage_text}" if passage_text else ""}
+{options_text}
 
 Provide your assessment in JSON format with the following structure:
 ```json
@@ -2370,7 +2477,7 @@ Focus your evaluation specifically on the clarity of terms and concepts, not oth
         }
 
 @requires_client
-def evaluate_cultural_references(question_text, client=None):
+def evaluate_cultural_references(question_data, client=None):
     """
     Evaluate if there are any cultural references or nuances that might affect how learners interpret the question.
     Uses an LLM to determine if the question uses universal references (easy) or specific cultural references (hard).
@@ -2389,6 +2496,18 @@ def evaluate_cultural_references(question_text, client=None):
     # Return placeholder values if client is None (for testing)
     if client is None:
         return 0, {"explanation": "Client not provided, returning default score"}
+
+    question_text = question_data["question"]
+    passage_text = question_data.get("passage", "")
+    options = question_data.get("options", [])
+    
+    # Format options string if present
+    options_text = ""
+    if options:
+        if isinstance(options, list):
+            options_text = "\nOptions:\n" + "\n".join([f"- {opt}" for opt in options])
+        elif isinstance(options, dict):
+            options_text = "\nOptions:\n" + "\n".join([f"- {k}: {v}" for k, v in options.items()])
     
     # Construct prompt for the LLM
     prompt = f"""
@@ -2418,6 +2537,8 @@ HARD (Score 1):
 Please analyze the following question:
 
 QUESTION: {question_text}
+{f"PASSAGE: {passage_text}" if passage_text else ""}
+{options_text}
 
 Provide your assessment in JSON format with the following structure:
 ```json
@@ -2474,7 +2595,7 @@ def aggregate_learning_objectives(question_data, client=None):
     # Get scores for each component (placeholders)
     bloom_score, bloom_details = determine_bloom_taxonomy_level(question_text, client)
     dok_score, dok_details = determine_dok_level(question_text, client)
-    contribution_score, contribution_details = evaluate_contribution_assessment(question_text, client)
+    contribution_score, contribution_details = evaluate_contribution_assessment(question_data, client)
     
     # Store all component results
     component_results = {
@@ -2691,7 +2812,7 @@ Focus your evaluation specifically on the cognitive complexity and depth of know
         }
 
 @requires_client
-def evaluate_contribution_assessment(question_text, client=None):
+def evaluate_contribution_assessment(question_data, client=None):
     """
     Evaluate how the question contributes to general overall assessment goals.
     Uses an LLM to determine if the question focuses on basic knowledge verification (easy) 
@@ -2711,6 +2832,18 @@ def evaluate_contribution_assessment(question_text, client=None):
     # Return placeholder values if client is None (for testing)
     if client is None:
         return 0, {"explanation": "Client not provided, returning default score"}
+
+    question_text = question_data["question"]
+    passage_text = question_data.get("passage", "")
+    options = question_data.get("options", [])
+    
+    # Format options string if present
+    options_text = ""
+    if options:
+        if isinstance(options, list):
+            options_text = "\nOptions:\n" + "\n".join([f"- {opt}" for opt in options])
+        elif isinstance(options, dict):
+            options_text = "\nOptions:\n" + "\n".join([f"- {k}: {v}" for k, v in options.items()])
     
     # Construct prompt for the LLM
     prompt = f"""
@@ -2743,6 +2876,8 @@ HARD (Score 1):
 Please analyze the following question:
 
 QUESTION: {question_text}
+{f"PASSAGE: {passage_text}" if passage_text else ""}
+{options_text}
 
 Provide your assessment in JSON format with the following structure:
 ```json
