@@ -1743,19 +1743,15 @@ def assess_context_difficulty(question_text, passage_text, client=None):
         # Process the results
         if overall_scores and len(overall_scores) > 0:
             # Get the overall score (0-5 scale)
-            difficulty_score = overall_scores[0].get("overall_score", 2.5)
-            
-            # Convert to 0-10 scale
-            overall_difficulty = difficulty_score * 2
+            difficulty_score = overall_scores[0].get("overall_score", 5)
             
             # Determine binary score based on threshold (6.5)
             # 0 for easy (< 6.5), 1 for hard (>= 6.5)
-            binary_score = 1 if overall_difficulty >= 6.5 else 0
+            binary_score = 1 if difficulty_score >= 6.5 else 0
             
             # Compile detailed results
             details = {
-                "overall_difficulty": overall_difficulty,
-                "original_score": difficulty_score,
+                "overall_difficulty": difficulty_score,
                 "binary_score": binary_score,
                 "category_scores": overall_scores[0].get("category_scores", {}),
                 "explanation": f"Passage difficulty score is {overall_difficulty:.2f}/10, which is "
