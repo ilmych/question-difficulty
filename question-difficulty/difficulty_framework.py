@@ -25,6 +25,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from dotenv import load_dotenv
 from tqdm import tqdm
+from cache_manager import cache_llm_response, get_cache
 
 # Import the parallel assessment function
 from parallel_implementation import parallel_assess_difficulty
@@ -132,10 +133,11 @@ def requires_client(func):
     return wrapper
 
 # LLM Interaction Functions
-@requires_client
+# Apply the decorator to the LLM response function
+@cache_llm_response
 def generate_llm_response(client, prompt, max_tokens=2000, model="claude-3-7-sonnet-20250219"):
     """
-    Generate a response from Claude with improved error handling.
+    Generate a response from Claude with improved error handling and caching.
     
     Args:
         client: An initialized Anthropic client
