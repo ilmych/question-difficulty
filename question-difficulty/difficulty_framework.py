@@ -1835,7 +1835,7 @@ def assess_context_difficulty(question_text, passage_text, client=None):
             
             # Compile detailed results
             details = {
-                "overall_difficulty": difficulty_score,
+                "difficulty_score": difficulty_score,
                 "binary_score": binary_score,
                 "category_scores": overall_scores[0].get("category_scores", {}),
                 "explanation": f"Passage difficulty score is {overall_difficulty:.2f}/10, which is "
