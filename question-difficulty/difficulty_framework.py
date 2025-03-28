@@ -25,10 +25,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from dotenv import load_dotenv
 from tqdm import tqdm
-from cache_manager import cache_llm_response, get_cache
-
-# Import the parallel assessment function
-from parallel_implementation import parallel_assess_difficulty
+try:
+    from cache_manager import cache_llm_response, get_cache
+    CACHE_AVAILABLE = True
+except ImportError:
+    # Define a no-op decorator if cache_manager is not available
+    def cache_llm_response(func):
+        return func
+    CACHE_AVAILABLE = False
 
 # Load environment variables for API keys
 load_dotenv()
