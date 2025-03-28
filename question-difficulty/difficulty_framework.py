@@ -2101,22 +2101,14 @@ def evaluate_visual_aids(question_data):
     ))
     
     # When there are visual references with specific identifiers, assume visuals are present
-    likely_has_visuals = has_specific_references or has_directive_phrases
+    likely_has_visuals = has_specific_references and has_directive_phrases
     
     # Define difficulty conditions:
     
-    # 1. Hard: Visual elements are referenced without clear indication they're provided
-    # (Visual references but no specific numbered references or directive phrases)
-    missing_visuals = visual_references > 0 and not likely_has_visuals
-    
-    # 2. Hard: Asked to perform visual interpretation without clear visual support
-    insufficient_visuals = requires_visual_interpretation and not likely_has_visuals
-    
-    # 3. Hard: Complex visual tasks (comparing multiple visuals, spatial reasoning)
-    complex_visual_task = multi_visual_comparison or (spatial_reasoning and visual_references > 0)
+    # Hard: Complex visual tasks (comparing multiple visuals, spatial reasoning)
+    is_hard = likely_has_visuals and (multi_visual_comparison or (spatial_reasoning and visual_references > 0))
     
     # Determine final difficulty score
-    is_hard = missing_visuals or insufficient_visuals or complex_visual_task
     difficulty_score = 1 if is_hard else 0
     
     return difficulty_score, {
@@ -2126,8 +2118,6 @@ def evaluate_visual_aids(question_data):
         "requires_visual_interpretation": requires_visual_interpretation,
         "spatial_reasoning": spatial_reasoning,
         "multi_visual_comparison": multi_visual_comparison,
-        "missing_visuals": missing_visuals,
-        "insufficient_visuals": insufficient_visuals,
         "complex_visual_task": complex_visual_task
     }
 
