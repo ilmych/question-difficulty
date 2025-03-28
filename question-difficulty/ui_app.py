@@ -203,3 +203,70 @@ if st.session_state.analysis_results is not None:
             st.markdown(report)
         else:
             st.text(report)
+
+# ---------------- Download Detailed Results ----------------
+st.subheader("📥 Download Complete Analysis Data")
+
+if st.session_state.analysis_results is not None:
+    # Start with the existing results
+    detailed_results = st.session_state.analysis_results.copy()
+    
+    # Check if we want to format the output for better readability
+    pretty_format = st.checkbox("Format JSON for human readability", value=True)
+    
+    # The existing results already contain the "details" field for each question,
+    # which has all the evaluation details. We don't need to recalculate anything.
+    # Just check if we might need to add any missing metadata
+    
+    # Add execution metadata
+    import datetime
+    detailed_results["metadata"] = {
+        "export_timestamp": datetime.datetime.now().isoformat(),
+        "version": "1.0",
+        "framework_version": "1.0.0"  # Update with your actual version
+    }
+    
+    # Convert to JSON with formatting
+    import json
+    
+    # Try to convert to JSON, handling any non-serializable objects
+    try:
+        if pretty_format:
+            json_str = json.dumps(detailed_results, indent=2)
+        else:
+            json_str = json.dumps(detailed_results)
+    except TypeError as e:
+        st.error(f"Error serializing results to JSON: {str(e)}")
+        
+        # Try a more robust approach with custom JSON encoder
+        class CustomJSONEncoder(json.JSONEncoder):
+            def default(self, obj):
+                try:
+                    return super().default(obj)
+                except TypeError:
+                    return str(obj)
+        
+        if pretty_format:
+            json_str = json.dumps(detailed_results, indent=2, cls=CustomJSONEncoder)
+        else:
+            json_str = json.dumps(detailed_results, cls=CustomJSONEncoder)
+    
+    # Create a download button for the full results
+    st.download_button(
+        label="Download Complete JSON",
+        data=json_str,
+        file_name="complete_difficulty_analysis.json",
+        mime="application/json",
+        help="Download all assessment data including detailed evaluations for each dimension"
+    )
+    
+    # Show file size estimate
+    file_size_kb = len(json_str) / 1024
+    st.caption(f"File size: approximately {file_size_kb:.1f} KB")
+    
+    # Add option to preview the JSON structure
+    if st.checkbox("Preview JSON Structure"):
+        st.json(detailed_results)
+
+else:
+    st.info("Run an analysis first to download detailed results")
