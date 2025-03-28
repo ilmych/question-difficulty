@@ -6,6 +6,12 @@ import io
 import logging
 import sys
 import os
+import time
+try:
+    from cache_manager import get_cache
+    CACHE_AVAILABLE = True
+except ImportError:
+    CACHE_AVAILABLE = False
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -27,6 +33,41 @@ if "passages" not in st.session_state:
     st.session_state.passages = None
 if "anthropic_client" not in st.session_state:
     st.session_state.anthropic_client = None
+
+# --- Cache Controls (New Section) ---
+with st.expander("Cache Settings", expanded=False):
+    if CACHE_AVAILABLE:
+        use_cache = st.checkbox("Enable Response Caching", value=True, 
+                               help="Cache LLM responses to speed up repeated evaluations")
+        cache_dir = st.text_input("Cache Directory", 
+                                 value=os.path.join(os.path.dirname(os.path.abspath(__file__)), "cache"),
+                                 help="Directory to store cached responses")
+        ttl_days = st.slider("Cache TTL (days)", min_value=1, max_value=90, value=30,
+                            help="Time-to-live for cached responses")
+        
+        # Initialize cache with the specified settings
+        cache = get_cache(cache_dir=cache_dir, ttl_days=ttl_days, enabled=use_cache)
+        
+        # Add clear cache button
+        if st.button("Clear Cache"):
+            cleared = cache.clear_all()
+            st.success(f"Cleared {cleared} cached responses")
+        
+        # Show cache statistics if available
+        if cache.enabled:
+            stats = cache.get_stats()
+            st.write("Cache Statistics:")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Hits", stats["hits"])
+            with col2:
+                st.metric("Misses", stats["misses"])
+            with col3:
+                hit_rate = stats["hit_rate"] if stats["total"] > 0 else 0
+                st.metric("Hit Rate", f"{hit_rate:.1f}%")
+    else:
+        st.warning("Caching is not available. Install the cache_manager module to enable caching.")
+        use_cache = False
 
 # ---------------- API Key ----------------
 api_key_input = st.text_input("Enter your Anthropic API key", type="password")
@@ -51,13 +92,35 @@ if uploaded_file is not None:
 
 # ---------------- Compute Difficulty ----------------
 if st.session_state.passages is not None:
+    # Add workers selection slider
+    max_workers = st.slider("Max Workers", min_value=1, max_value=10, value=5,
+                           help="Maximum number of parallel workers")
+    
     if st.button("Compute Difficulty"):
         with st.spinner("Analyzing difficulty..."):
+            # Track execution time
+            start_time = time.time()
+            
+            # Pass the cache settings to the assessment function
             results = parallel_assess_difficulty(
                 questions=st.session_state.passages,
-                client=st.session_state.anthropic_client
+                client=st.session_state.anthropic_client,
+                max_workers=max_workers,
+                use_cache=use_cache if CACHE_AVAILABLE else False
             )
+            
+            elapsed_time = time.time() - start_time
             st.session_state.analysis_results = results
+            
+            # Show execution time
+            st.success(f"Analysis completed in {elapsed_time:.2f} seconds " +
+                     f"({elapsed_time / len(st.session_state.passages):.2f} seconds per question)")
+            
+            # Show cache statistics after computation if caching is enabled
+            if CACHE_AVAILABLE and use_cache:
+                stats = cache.get_stats()
+                st.info(f"Cache performance: {stats['hits']} hits, {stats['misses']} misses " +
+                       f"({stats['hit_rate']:.1f}% hit rate)")
 
 # ---------------- Display Results ----------------
 if st.session_state.analysis_results is not None:
