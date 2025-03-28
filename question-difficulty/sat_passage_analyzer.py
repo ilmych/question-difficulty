@@ -7,6 +7,7 @@ import requests
 from collections import Counter
 from io import StringIO
 import logging
+import os
 logger = logging.getLogger("sat_passage_analyzer")
 
 
@@ -390,8 +391,12 @@ class SATPassageAnalyzer:
                 })
         return lexile_scores
     
-    def calculate_vocabulary_difficulty_ratio(self, oxford_wordlist_path='Oxford 5000.txt'):
+    def calculate_vocabulary_difficulty_ratio(self, oxford_wordlist_path=None):
         """Calculate the ratio of words beyond the 5000 most common English words."""
+        # If no path is provided, use the default path relative to the script directory
+        if oxford_wordlist_path is None:
+            oxford_wordlist_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
+                                             "data", "Oxford 5000.txt")
         try:
             with open(oxford_wordlist_path, 'r', encoding='utf-8') as f:
                 common_words = set(word.strip().lower() for word in f if word.strip())
@@ -444,8 +449,12 @@ class SATPassageAnalyzer:
                 })
         return difficulty_ratios
     
-    def calculate_academic_word_usage(self, academic_wordlist_path='Oxford Phrasal Academic Lexicon.txt'):
+    def calculate_academic_word_usage(self, academic_wordlist_path=None):
         """Calculate the ratio of academic words in the text."""
+        # If no path is provided, use the default path relative to the script directory
+        if academic_wordlist_path is None:
+            academic_wordlist_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
+                                               "data", "Oxford Phrasal Academic Lexicon.txt")
         try:
             with open(academic_wordlist_path, 'r', encoding='utf-8') as f:
                 academic_words = set(word.strip().lower() for word in f if word.strip())
