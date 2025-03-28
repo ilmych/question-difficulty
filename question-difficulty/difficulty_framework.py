@@ -2067,7 +2067,7 @@ def evaluate_visual_aids(question_data):
     
     # Look for phrases that indicate whether visual analysis is required
     requires_visual_interpretation = bool(re.search(
-        r'\b(shown|displayed|depicted|illustrated|presented|'
+        r'\b(shown|displayed|depicted|'
         r'interpret|analyze|identify|label|'
         r'trend|pattern|point|mark)\b', 
         text_lower
