@@ -397,7 +397,7 @@ def aggregate_knowledge_requirements(question_data, client=None):
     domain_specific_score, domain_specific_details = evaluate_domain_specific(question_data, client)
     knowledge_level_score, knowledge_level_details = evaluate_knowledge_level(question_data, client)
     concept_abstractness_score, concept_abstractness_details = evaluate_concept_abstractness(question_data, client)
-    specialized_terminology_score, specialized_terminology_details = evaluate_specialized_terminology(question_data)
+    specialized_terminology_score, specialized_terminology_details = evaluate_specialized_terminology(question_text)
     
     # Store all component results
     component_results = {
