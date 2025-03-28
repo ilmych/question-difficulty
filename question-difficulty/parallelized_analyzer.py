@@ -105,6 +105,17 @@ def calculate_domain_specific_terminology_single(self, passage_index: int, syste
             sys_prompt = "You are an expert linguist specializing in vocabulary analysis. Provide accurate, objective assessments."
         else:
             sys_prompt = system_prompt
+
+        # Check if claude_params exists and use defaults if not
+        if not hasattr(self, 'claude_params'):
+            model = "claude-3-7-sonnet-20250219"
+            max_tokens = 2000
+            temperature = 0
+            print(f"Warning: claude_params not found, using default values")
+        else:
+            model = self.claude_params.get("model", "claude-3-7-sonnet-20250219")
+            max_tokens = self.claude_params.get("max_tokens", 2000)
+            temperature = self.claude_params.get("temperature", 0)
             
         PROMPT_TEMPLATE = """
         I need you to analyze the domain-specific terminology in the following passage. 
@@ -141,9 +152,9 @@ def calculate_domain_specific_terminology_single(self, passage_index: int, syste
         time.sleep(0.1)
         
         response = self.anthropic_client.messages.create(
-            model=self.claude_params["model"],
-            max_tokens=self.claude_params["max_tokens"],
-            temperature=self.claude_params["temperature"],
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
             system=sys_prompt,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -227,6 +238,17 @@ def calculate_subordinate_clauses_single(self, passage_index: int, system_prompt
             sys_prompt = "You are an expert linguist specializing in syntax analysis. Provide accurate, objective assessments."
         else:
             sys_prompt = system_prompt
+
+        # Check if claude_params exists and use defaults if not
+        if not hasattr(self, 'claude_params'):
+            model = "claude-3-7-sonnet-20250219"
+            max_tokens = 2000
+            temperature = 0
+            print(f"Warning: claude_params not found, using default values")
+        else:
+            model = self.claude_params.get("model", "claude-3-7-sonnet-20250219")
+            max_tokens = self.claude_params.get("max_tokens", 2000)
+            temperature = self.claude_params.get("temperature", 0)
             
         PROMPT_TEMPLATE = """
         Analyze the subordinate clauses in the following passage. A subordinate clause (or dependent clause) is a clause that cannot stand alone as a complete sentence because it does not express a complete thought.
@@ -265,9 +287,9 @@ def calculate_subordinate_clauses_single(self, passage_index: int, system_prompt
         time.sleep(0.1)
         
         response = self.anthropic_client.messages.create(
-            model=self.claude_params["model"],
-            max_tokens=self.claude_params["max_tokens"],
-            temperature=self.claude_params["temperature"],
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
             system=sys_prompt,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -350,6 +372,17 @@ def calculate_syntactic_variety_single(self, passage_index: int, system_prompt: 
             sys_prompt = "You are an expert linguist specializing in syntactic analysis. Provide accurate, objective assessments."
         else:
             sys_prompt = system_prompt
+
+        # Check if claude_params exists and use defaults if not
+        if not hasattr(self, 'claude_params'):
+            model = "claude-3-7-sonnet-20250219"
+            max_tokens = 2000
+            temperature = 0
+            print(f"Warning: claude_params not found, using default values")
+        else:
+            model = self.claude_params.get("model", "claude-3-7-sonnet-20250219")
+            max_tokens = self.claude_params.get("max_tokens", 2000)
+            temperature = self.claude_params.get("temperature", 0)
             
         PROMPT_TEMPLATE = """
         Analyze the syntactic variety in the following passage. Syntactic variety refers to the diversity of sentence structures used in writing.
@@ -400,9 +433,9 @@ def calculate_syntactic_variety_single(self, passage_index: int, system_prompt: 
         time.sleep(0.1)
         
         response = self.anthropic_client.messages.create(
-            model=self.claude_params["model"],
-            max_tokens=self.claude_params["max_tokens"],
-            temperature=self.claude_params["temperature"],
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
             system=sys_prompt,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -483,6 +516,17 @@ def calculate_structural_inversions_single(self, passage_index: int, system_prom
             sys_prompt = "You are an expert linguist specializing in sentence structure analysis. Provide accurate, objective assessments."
         else:
             sys_prompt = system_prompt
+
+        # Check if claude_params exists and use defaults if not
+        if not hasattr(self, 'claude_params'):
+            model = "claude-3-7-sonnet-20250219"
+            max_tokens = 2000
+            temperature = 0
+            print(f"Warning: claude_params not found, using default values")
+        else:
+            model = self.claude_params.get("model", "claude-3-7-sonnet-20250219")
+            max_tokens = self.claude_params.get("max_tokens", 2000)
+            temperature = self.claude_params.get("temperature", 0)
             
         PROMPT_TEMPLATE = """
         Analyze the structural inversions in the following passage. Structural inversions are sentences that deviate from the standard subject-verb-object pattern, often for emphasis or stylistic effect.
@@ -530,9 +574,9 @@ def calculate_structural_inversions_single(self, passage_index: int, system_prom
         time.sleep(0.1)
         
         response = self.anthropic_client.messages.create(
-            model=self.claude_params["model"],
-            max_tokens=self.claude_params["max_tokens"],
-            temperature=self.claude_params["temperature"],
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
             system=sys_prompt,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -613,6 +657,17 @@ def calculate_embedded_clauses_single(self, passage_index: int, system_prompt: O
             sys_prompt = "You are an expert linguist specializing in clause analysis. Provide accurate, objective assessments."
         else:
             sys_prompt = system_prompt
+
+        # Check if claude_params exists and use defaults if not
+        if not hasattr(self, 'claude_params'):
+            model = "claude-3-7-sonnet-20250219"
+            max_tokens = 2000
+            temperature = 0
+            print(f"Warning: claude_params not found, using default values")
+        else:
+            model = self.claude_params.get("model", "claude-3-7-sonnet-20250219")
+            max_tokens = self.claude_params.get("max_tokens", 2000)
+            temperature = self.claude_params.get("temperature", 0)
             
         PROMPT_TEMPLATE = """
         Analyze the embedded clauses in the following passage. Embedded clauses are clauses that are nested within other clauses, adding complexity to sentence structure.
@@ -655,9 +710,9 @@ def calculate_embedded_clauses_single(self, passage_index: int, system_prompt: O
         time.sleep(0.1)
         
         response = self.anthropic_client.messages.create(
-            model=self.claude_params["model"],
-            max_tokens=self.claude_params["max_tokens"],
-            temperature=self.claude_params["temperature"],
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
             system=sys_prompt,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -742,6 +797,17 @@ def calculate_abstraction_level_single(self, passage_index: int, system_prompt: 
             sys_prompt = "You are an expert in cognitive linguistics and reading comprehension. Provide accurate, objective assessments."
         else:
             sys_prompt = system_prompt
+
+        # Check if claude_params exists and use defaults if not
+        if not hasattr(self, 'claude_params'):
+            model = "claude-3-7-sonnet-20250219"
+            max_tokens = 2000
+            temperature = 0
+            print(f"Warning: claude_params not found, using default values")
+        else:
+            model = self.claude_params.get("model", "claude-3-7-sonnet-20250219")
+            max_tokens = self.claude_params.get("max_tokens", 2000)
+            temperature = self.claude_params.get("temperature", 0)
             
         PROMPT_TEMPLATE = """
         Analyze the level of abstraction in the following passage. Consider the ratio of concrete concepts (tangible, specific, sensory) versus abstract concepts (theoretical, general, intangible).
@@ -778,9 +844,9 @@ def calculate_abstraction_level_single(self, passage_index: int, system_prompt: 
         time.sleep(0.1)
         
         response = self.anthropic_client.messages.create(
-            model=self.claude_params["model"],
-            max_tokens=self.claude_params["max_tokens"],
-            temperature=self.claude_params["temperature"],
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
             system=sys_prompt,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -859,6 +925,17 @@ def calculate_concept_familiarity_single(self, passage_index: int, system_prompt
             sys_prompt = "You are an expert in educational assessment and cognitive development. Provide accurate, objective assessments for high school students taking the SAT exam."
         else:
             sys_prompt = system_prompt
+
+        # Check if claude_params exists and use defaults if not
+        if not hasattr(self, 'claude_params'):
+            model = "claude-3-7-sonnet-20250219"
+            max_tokens = 2000
+            temperature = 0
+            print(f"Warning: claude_params not found, using default values")
+        else:
+            model = self.claude_params.get("model", "claude-3-7-sonnet-20250219")
+            max_tokens = self.claude_params.get("max_tokens", 2000)
+            temperature = self.claude_params.get("temperature", 0)
             
         PROMPT_TEMPLATE = """
         Analyze the familiarity of concepts in the following passage. Consider how common the main ideas would be to typical high school students taking the SAT exam.
@@ -895,9 +972,9 @@ def calculate_concept_familiarity_single(self, passage_index: int, system_prompt
         time.sleep(0.1)
         
         response = self.anthropic_client.messages.create(
-            model=self.claude_params["model"],
-            max_tokens=self.claude_params["max_tokens"],
-            temperature=self.claude_params["temperature"],
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
             system=sys_prompt,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -976,6 +1053,17 @@ def calculate_implied_information_single(self, passage_index: int, system_prompt
             sys_prompt = "You are an expert in critical reading and textual analysis. Provide accurate, objective assessments."
         else:
             sys_prompt = system_prompt
+
+        # Check if claude_params exists and use defaults if not
+        if not hasattr(self, 'claude_params'):
+            model = "claude-3-7-sonnet-20250219"
+            max_tokens = 2000
+            temperature = 0
+            print(f"Warning: claude_params not found, using default values")
+        else:
+            model = self.claude_params.get("model", "claude-3-7-sonnet-20250219")
+            max_tokens = self.claude_params.get("max_tokens", 2000)
+            temperature = self.claude_params.get("temperature", 0)
             
         PROMPT_TEMPLATE = """
         Analyze the implied information in the following passage. Implied information refers to content that is not explicitly stated but must be inferred by the reader.
@@ -1013,9 +1101,9 @@ def calculate_implied_information_single(self, passage_index: int, system_prompt
         time.sleep(0.1)
         
         response = self.anthropic_client.messages.create(
-            model=self.claude_params["model"],
-            max_tokens=self.claude_params["max_tokens"],
-            temperature=self.claude_params["temperature"],
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
             system=sys_prompt,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -1092,6 +1180,17 @@ def calculate_argumentative_complexity_single(self, passage_index: int, system_p
             sys_prompt = "You are an expert in rhetoric and argument analysis. Provide accurate, objective assessments."
         else:
             sys_prompt = system_prompt
+
+        # Check if claude_params exists and use defaults if not
+        if not hasattr(self, 'claude_params'):
+            model = "claude-3-7-sonnet-20250219"
+            max_tokens = 2000
+            temperature = 0
+            print(f"Warning: claude_params not found, using default values")
+        else:
+            model = self.claude_params.get("model", "claude-3-7-sonnet-20250219")
+            max_tokens = self.claude_params.get("max_tokens", 2000)
+            temperature = self.claude_params.get("temperature", 0)
             
         PROMPT_TEMPLATE = """
         Analyze the argumentative complexity in the following passage. Consider whether the argument structure is linear (simple, sequential points) or complex (multifaceted, interconnected, nuanced).
@@ -1129,9 +1228,9 @@ def calculate_argumentative_complexity_single(self, passage_index: int, system_p
         time.sleep(0.1)
         
         response = self.anthropic_client.messages.create(
-            model=self.claude_params["model"],
-            max_tokens=self.claude_params["max_tokens"],
-            temperature=self.claude_params["temperature"],
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
             system=sys_prompt,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -1210,6 +1309,17 @@ def calculate_organizational_clarity_single(self, passage_index: int, system_pro
             sys_prompt = "You are an expert in text structure and composition. Provide accurate, objective assessments."
         else:
             sys_prompt = system_prompt
+
+        # Check if claude_params exists and use defaults if not
+        if not hasattr(self, 'claude_params'):
+            model = "claude-3-7-sonnet-20250219"
+            max_tokens = 2000
+            temperature = 0
+            print(f"Warning: claude_params not found, using default values")
+        else:
+            model = self.claude_params.get("model", "claude-3-7-sonnet-20250219")
+            max_tokens = self.claude_params.get("max_tokens", 2000)
+            temperature = self.claude_params.get("temperature", 0)
             
         PROMPT_TEMPLATE = """
         Analyze the organizational clarity in the following passage. Consider how transparent and easy to follow the structure is.
@@ -1249,9 +1359,9 @@ def calculate_organizational_clarity_single(self, passage_index: int, system_pro
         time.sleep(0.1)
         
         response = self.anthropic_client.messages.create(
-            model=self.claude_params["model"],
-            max_tokens=self.claude_params["max_tokens"],
-            temperature=self.claude_params["temperature"],
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
             system=sys_prompt,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -1335,6 +1445,17 @@ def calculate_transitional_elements_single(self, passage_index: int, system_prom
             sys_prompt = "You are an expert in composition and textual analysis. Provide accurate, objective assessments."
         else:
             sys_prompt = system_prompt
+
+        # Check if claude_params exists and use defaults if not
+        if not hasattr(self, 'claude_params'):
+            model = "claude-3-7-sonnet-20250219"
+            max_tokens = 2000
+            temperature = 0
+            print(f"Warning: claude_params not found, using default values")
+        else:
+            model = self.claude_params.get("model", "claude-3-7-sonnet-20250219")
+            max_tokens = self.claude_params.get("max_tokens", 2000)
+            temperature = self.claude_params.get("temperature", 0)
             
         PROMPT_TEMPLATE = """
         Analyze the transitional elements in the following passage. Consider the clarity and sophistication of transitions between ideas, paragraphs, and sections.
@@ -1374,9 +1495,9 @@ def calculate_transitional_elements_single(self, passage_index: int, system_prom
         time.sleep(0.1)
         
         response = self.anthropic_client.messages.create(
-            model=self.claude_params["model"],
-            max_tokens=self.claude_params["max_tokens"],
-            temperature=self.claude_params["temperature"],
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
             system=sys_prompt,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -1455,6 +1576,17 @@ def calculate_prior_knowledge_requirements_single(self, passage_index: int, syst
             sys_prompt = "You are an expert in educational assessment and content analysis. Provide accurate, objective assessments for high school students preparing for the SAT."
         else:
             sys_prompt = system_prompt
+
+        # Check if claude_params exists and use defaults if not
+        if not hasattr(self, 'claude_params'):
+            model = "claude-3-7-sonnet-20250219"
+            max_tokens = 2000
+            temperature = 0
+            print(f"Warning: claude_params not found, using default values")
+        else:
+            model = self.claude_params.get("model", "claude-3-7-sonnet-20250219")
+            max_tokens = self.claude_params.get("max_tokens", 2000)
+            temperature = self.claude_params.get("temperature", 0)
             
         PROMPT_TEMPLATE = """
         Analyze the prior knowledge requirements in the following passage. Consider what background knowledge a reader would need to fully understand the content.
@@ -1492,9 +1624,9 @@ def calculate_prior_knowledge_requirements_single(self, passage_index: int, syst
         time.sleep(0.1)
         
         response = self.anthropic_client.messages.create(
-            model=self.claude_params["model"],
-            max_tokens=self.claude_params["max_tokens"],
-            temperature=self.claude_params["temperature"],
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
             system=sys_prompt,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -1571,6 +1703,17 @@ def calculate_disciplinary_perspective_single(self, passage_index: int, system_p
             sys_prompt = "You are an expert in academic disciplines and educational assessment. Provide accurate, objective assessments for high school students."
         else:
             sys_prompt = system_prompt
+
+        # Check if claude_params exists and use defaults if not
+        if not hasattr(self, 'claude_params'):
+            model = "claude-3-7-sonnet-20250219"
+            max_tokens = 2000
+            temperature = 0
+            print(f"Warning: claude_params not found, using default values")
+        else:
+            model = self.claude_params.get("model", "claude-3-7-sonnet-20250219")
+            max_tokens = self.claude_params.get("max_tokens", 2000)
+            temperature = self.claude_params.get("temperature", 0)
             
         PROMPT_TEMPLATE = """
         Analyze the disciplinary perspective in the following passage. Consider what field-specific thought patterns and approaches are required to fully understand the content.
@@ -1608,9 +1751,9 @@ def calculate_disciplinary_perspective_single(self, passage_index: int, system_p
         time.sleep(0.1)
         
         response = self.anthropic_client.messages.create(
-            model=self.claude_params["model"],
-            max_tokens=self.claude_params["max_tokens"],
-            temperature=self.claude_params["temperature"],
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
             system=sys_prompt,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -1687,6 +1830,17 @@ def calculate_language_modernity_single(self, passage_index: int, system_prompt:
             sys_prompt = "You are an expert in linguistic analysis and historical language development. Provide accurate, objective assessments for high school students."
         else:
             sys_prompt = system_prompt
+
+        # Check if claude_params exists and use defaults if not
+        if not hasattr(self, 'claude_params'):
+            model = "claude-3-7-sonnet-20250219"
+            max_tokens = 2000
+            temperature = 0
+            print(f"Warning: claude_params not found, using default values")
+        else:
+            model = self.claude_params.get("model", "claude-3-7-sonnet-20250219")
+            max_tokens = self.claude_params.get("max_tokens", 2000)
+            temperature = self.claude_params.get("temperature", 0)
             
         PROMPT_TEMPLATE = """
         Analyze the language modernity in the following passage. Consider the spectrum from contemporary to archaic language use.
@@ -1724,9 +1878,9 @@ def calculate_language_modernity_single(self, passage_index: int, system_prompt:
         time.sleep(0.1)
         
         response = self.anthropic_client.messages.create(
-            model=self.claude_params["model"],
-            max_tokens=self.claude_params["max_tokens"],
-            temperature=self.claude_params["temperature"],
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
             system=sys_prompt,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -1803,6 +1957,17 @@ def calculate_inference_requirement_single(self, passage_index: int, system_prom
             sys_prompt = "You are an expert in reading comprehension and cognitive analysis. Provide accurate, objective assessments for high school students taking the SAT."
         else:
             sys_prompt = system_prompt
+
+        # Check if claude_params exists and use defaults if not
+        if not hasattr(self, 'claude_params'):
+            model = "claude-3-7-sonnet-20250219"
+            max_tokens = 2000
+            temperature = 0
+            print(f"Warning: claude_params not found, using default values")
+        else:
+            model = self.claude_params.get("model", "claude-3-7-sonnet-20250219")
+            max_tokens = self.claude_params.get("max_tokens", 2000)
+            temperature = self.claude_params.get("temperature", 0)
             
         PROMPT_TEMPLATE = """
         Analyze the inference requirements in the following passage. Consider how much reading between the lines is needed to fully understand the content.
@@ -1840,9 +2005,9 @@ def calculate_inference_requirement_single(self, passage_index: int, system_prom
         time.sleep(0.1)
         
         response = self.anthropic_client.messages.create(
-            model=self.claude_params["model"],
-            max_tokens=self.claude_params["max_tokens"],
-            temperature=self.claude_params["temperature"],
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
             system=sys_prompt,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -1919,6 +2084,17 @@ def calculate_figurative_language_single(self, passage_index: int, system_prompt
             sys_prompt = "You are an expert in literary analysis and rhetoric. Provide accurate, objective assessments for high school students."
         else:
             sys_prompt = system_prompt
+
+        # Check if claude_params exists and use defaults if not
+        if not hasattr(self, 'claude_params'):
+            model = "claude-3-7-sonnet-20250219"
+            max_tokens = 2000
+            temperature = 0
+            print(f"Warning: claude_params not found, using default values")
+        else:
+            model = self.claude_params.get("model", "claude-3-7-sonnet-20250219")
+            max_tokens = self.claude_params.get("max_tokens", 2000)
+            temperature = self.claude_params.get("temperature", 0)
             
         PROMPT_TEMPLATE = """
         Analyze the figurative language in the following passage. Consider the density and types of metaphors, similes, personification, and other figurative devices.
@@ -1957,9 +2133,9 @@ def calculate_figurative_language_single(self, passage_index: int, system_prompt
         time.sleep(0.1)
         
         response = self.anthropic_client.messages.create(
-            model=self.claude_params["model"],
-            max_tokens=self.claude_params["max_tokens"],
-            temperature=self.claude_params["temperature"],
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
             system=sys_prompt,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -2038,6 +2214,17 @@ def calculate_authors_purpose_single(self, passage_index: int, system_prompt: Op
             sys_prompt = "You are an expert in rhetorical analysis and textual interpretation. Provide accurate, objective assessments for high school students."
         else:
             sys_prompt = system_prompt
+
+        # Check if claude_params exists and use defaults if not
+        if not hasattr(self, 'claude_params'):
+            model = "claude-3-7-sonnet-20250219"
+            max_tokens = 2000
+            temperature = 0
+            print(f"Warning: claude_params not found, using default values")
+        else:
+            model = self.claude_params.get("model", "claude-3-7-sonnet-20250219")
+            max_tokens = self.claude_params.get("max_tokens", 2000)
+            temperature = self.claude_params.get("temperature", 0)
             
         PROMPT_TEMPLATE = """
         Analyze the clarity of the author's purpose in the following passage. Consider how obvious versus obscure the author's intent is.
@@ -2073,9 +2260,9 @@ def calculate_authors_purpose_single(self, passage_index: int, system_prompt: Op
         time.sleep(0.1)
         
         response = self.anthropic_client.messages.create(
-            model=self.claude_params["model"],
-            max_tokens=self.claude_params["max_tokens"],
-            temperature=self.claude_params["temperature"],
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
             system=sys_prompt,
             messages=[{"role": "user", "content": prompt}]
         )
