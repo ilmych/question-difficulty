@@ -76,6 +76,20 @@ if api_key_input and st.session_state.anthropic_client is None:
     st.session_state.anthropic_client = anthropic.Anthropic(api_key=api_key_input)
     st.success("Anthropic client initialized.")
 
+# ---------------- Cache Status Indicator (ADD THIS) ----------------
+if CACHE_AVAILABLE:
+    with st.sidebar:
+        st.subheader("Cache Status")
+        if use_cache:  # Assuming 'use_cache' is defined in your cache settings section
+            st.success("Caching is enabled")
+            if "analysis_results" in st.session_state and st.session_state.analysis_results is not None:
+                stats = cache.get_stats()
+                st.progress(stats["hit_rate"] / 100)
+                st.text(f"Hit Rate: {stats['hit_rate']:.1f}%")
+                st.text(f"Hits: {stats['hits']}, Misses: {stats['misses']}")
+        else:
+            st.warning("Caching is disabled")
+
 # ---------------- File Upload ----------------
 uploaded_file = st.file_uploader("Upload your input file (.json or .csv)", type=["json", "csv"])
 
@@ -132,33 +146,57 @@ if st.session_state.analysis_results is not None:
     st.subheader("📊 Overall Test Difficulty")
     st.write("**Level:**", overall["level"])
     st.write("**Average Score:**", f"{overall['score']:.2f}")
+    
+    # --- Cache Performance (ADD THIS) ---
+    if CACHE_AVAILABLE and use_cache:
+        st.subheader("🚀 Cache Performance")
+        stats = cache.get_stats()
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("API Calls Saved", stats["hits"])
+        with col2:
+            st.metric("Cache Hit Rate", f"{stats['hit_rate']:.1f}%")
+        with col3:
+            st.metric("Total Lookups", stats["total"])
 
     # ---------------- Generate Report ----------------
     st.subheader("📝 Generate Difficulty Report")
     report_format = st.selectbox("Select report format", ["html", "markdown", "text"])
 
     if st.button("Generate Report"):
+        # Add cache info to the report metadata if available
+        report_metadata = {}
+        if CACHE_AVAILABLE and use_cache:
+            stats = cache.get_stats()
+            report_metadata["cache_performance"] = {
+                "hits": stats["hits"],
+                "misses": stats["misses"],
+                "hit_rate": stats["hit_rate"],
+                "api_calls_saved": stats["hits"]
+            }
+        
         report = generate_difficulty_report(
             question_results=question_data,
             overall_result=overall,
             output_format=report_format,
-            output_file=None
+            output_file=None,
+            metadata=report_metadata  # Pass the metadata to your report function
         )
-
+    
         # Choose correct MIME type
         mime_type = {
             "html": "text/html",
             "markdown": "text/markdown",
             "text": "text/plain"
         }[report_format]
-
+    
         st.download_button(
             label="📥 Download Report",
             data=report,
             file_name=f"difficulty_report.{report_format}",
             mime=mime_type
         )
-
+    
         if report_format == "html":
             st.markdown(report, unsafe_allow_html=True)
         elif report_format == "markdown":
