@@ -1543,7 +1543,8 @@ Focus your evaluation specifically on the clarity or ambiguity of the context, n
 
 def assess_context_difficulty(question_text, passage_text, client=None):
     """
-    Assess the difficulty of the passage/context using the SAT Passage Analyzer.
+    Assess the difficulty of the passage/context using both algorithmic metrics
+    and LLM-based analysis with parallel processing.
     
     Args:
         question_text: The text of the question to evaluate
@@ -1566,7 +1567,7 @@ def assess_context_difficulty(question_text, passage_text, client=None):
         }
     
     try:
-        # Import the analyzer
+        # Import the analyzer and parallel processor
         from sat_passage_analyzer import SATPassageAnalyzer
         
         # Initialize the analyzer
@@ -1580,9 +1581,10 @@ def assess_context_difficulty(question_text, passage_text, client=None):
         }
         analyzer.passages = [passage]
         
-        # Set up the Anthropic client if provided
-        if client is not None and hasattr(client, 'api_key'):
-            analyzer.init_anthropic_client(api_key=client.api_key)
+        # Only initialize the Anthropic client in analyzer if we have a valid client
+        # and it's not already initialized to avoid unnecessary reinitialization
+        if client is not None and not hasattr(analyzer, 'anthropic_client'):
+            analyzer.anthropic_client = client
         
         # Calculate basic metrics (non-API dependent)
         analyzer.calculate_flesch_kincaid()
@@ -1591,9 +1593,143 @@ def assess_context_difficulty(question_text, passage_text, client=None):
         # Try to calculate vocabulary metrics
         try:
             analyzer.calculate_vocabulary_difficulty_ratio()
-            analyzer.calculate_academic_word_usage()
         except Exception as e:
             print(f"Error calculating vocabulary metrics: {e}")
+        
+        # If client is available, calculate LLM-dependent metrics in parallel
+        if client is not None:
+            max_workers = 3  # Limit concurrent API calls to avoid rate limiting
+            
+            try:
+                # Import parallel processing functionality
+                from parallelized_analyzer import (
+                    calculate_lexile_scores_parallel,
+                    calculate_subordinate_clauses_parallel,
+                    calculate_syntactic_variety_parallel,
+                    calculate_structural_inversions_parallel,
+                    calculate_embedded_clauses_parallel,
+                    calculate_abstraction_level_parallel,
+                    calculate_implied_information_parallel,
+                    calculate_argumentative_complexity_parallel,
+                    calculate_inference_requirement_parallel, 
+                    calculate_figurative_language_parallel
+                )
+                
+                # Dynamically add these methods to our analyzer instance
+                import types
+                for func_name in [
+                    'calculate_lexile_scores_parallel',
+                    'calculate_subordinate_clauses_parallel',
+                    'calculate_syntactic_variety_parallel',
+                    'calculate_structural_inversions_parallel',
+                    'calculate_embedded_clauses_parallel',
+                    'calculate_abstraction_level_parallel',
+                    'calculate_implied_information_parallel',
+                    'calculate_argumentative_complexity_parallel',
+                    'calculate_inference_requirement_parallel',
+                    'calculate_figurative_language_parallel'
+                ]:
+                    if func_name in globals():
+                        setattr(analyzer, func_name, types.MethodType(globals()[func_name], analyzer))
+                
+                # Run metrics in parallel with max_workers to limit concurrent API calls
+                
+                
+                analyzer.run_with_retry(
+                    analyzer.calculate_lexile_scores_parallel,
+                    metric_category="readability",
+                    metric_name="lexile_score",
+                    max_workers=max_workers
+                )
+                
+                analyzer.run_with_retry(
+                    analyzer.calculate_subordinate_clauses_parallel,
+                    metric_category="syntactic_complexity",
+                    metric_name="subordinate_clauses",
+                    max_workers=max_workers
+                )
+                
+                analyzer.run_with_retry(
+                    analyzer.calculate_syntactic_variety_parallel,
+                    metric_category="syntactic_complexity",
+                    metric_name="syntactic_variety",
+                    max_workers=max_workers
+                )
+
+                analyzer.run_with_retry(
+                    analyzer.calculate_structural_inversions_parallel,
+                    metric_category="syntactic_complexity",
+                    metric_name="structural_inversions",
+                    max_workers=max_workers
+                )
+                
+                analyzer.run_with_retry(
+                    analyzer.calculate_embedded_clauses_parallel,
+                    metric_category="syntactic_complexity",
+                    metric_name="embedded_clauses",
+                    max_workers=max_workers
+                )
+                
+                analyzer.run_with_retry(
+                    analyzer.calculate_abstraction_level_parallel,
+                    metric_category="conceptual_density",
+                    metric_name="abstraction_level",
+                    max_workers=max_workers
+                )
+                
+                analyzer.run_with_retry(
+                    analyzer.calculate_implied_information_parallel,
+                    metric_category="conceptual_density",
+                    metric_name="implied_information",
+                    max_workers=max_workers
+                )
+                
+                analyzer.run_with_retry(
+                    analyzer.calculate_argumentative_complexity_parallel,
+                    metric_category="rhetorical_structure",
+                    metric_name="argumentative_complexity",
+                    max_workers=max_workers
+                )
+
+                analyzer.run_with_retry(
+                    analyzer.calculate_inference_requirement_parallel,
+                    metric_category="cognitive_demands",
+                    metric_name="inference_requirement",
+                    max_workers=max_workers
+                )
+
+                analyzer.run_with_retry(
+                    analyzer.calculate_figurative_language_parallel,
+                    metric_category="cognitive_demands",
+                    metric_name="figurative_language",
+                    max_workers=max_workers
+                )
+            
+            except Exception as e:
+                print(f"Error initializing or executing parallel processing: {e}")
+                # Fall back to sequential processing if parallel processing fails
+                try:
+                    # Domain-specific terminology complexity
+                    analyzer.calculate_lexile_scores()
+                    
+                    # Syntactic complexity
+                    analyzer.calculate_subordinate_clauses()
+                    analyzer.calculate_syntactic_variety()
+                    analyzer.calculate_structural_inversions()
+                    analyzer.calculate_embedded_clauses()
+                    
+                    # Conceptual density
+                    analyzer.calculate_abstraction_level()
+                    analyzer.calculate_implied_information()
+
+                    # Rhetorical structure
+                    analyzer.calculate_argumentative_complexity()
+
+                    # Cognitive demands
+                    analyzer.calculate_inference_requirement()
+                    analyzer.calculate_figurative_language()
+                except Exception as e:
+                    print(f"Error in sequential fallback processing: {e}")
         
         # Calculate overall difficulty
         overall_scores = analyzer.calculate_overall_difficulty()
