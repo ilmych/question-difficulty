@@ -2046,7 +2046,7 @@ def evaluate_visual_aids(question_data):
     30% of question structure and format score"""
     # Convert to lowercase for case-insensitive matching
     question_text = question_data["question"]
-    passage_text = question_data.get("passage")
+    passage_text = question_data.get("passage", "")
     text_lower = text_lower = (passage_text + ", " + question_text).lower()
     
     # Check for references to visual elements in the question text
@@ -2117,8 +2117,7 @@ def evaluate_visual_aids(question_data):
         "likely_has_visuals": likely_has_visuals,
         "requires_visual_interpretation": requires_visual_interpretation,
         "spatial_reasoning": spatial_reasoning,
-        "multi_visual_comparison": multi_visual_comparison,
-        "complex_visual_task": complex_visual_task
+        "multi_visual_comparison": multi_visual_comparison
     }
 
 @requires_client
