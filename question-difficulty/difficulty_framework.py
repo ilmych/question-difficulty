@@ -1913,8 +1913,15 @@ def evaluate_question_format(question_data):
     is_multiple_choice = isinstance(options, (list, dict)) and len(options) > 2
     
     # Check for true/false format
-    is_true_false = isinstance(options, (list, dict)) and len(options) == 2 and any(x == "True" or (isinstance(x, str) and re.match(r"(?i)^yes", x.strip())) for x in (options if isinstance(options, list) else options.values())
-    
+    is_true_false = (
+    isinstance(options, (list, dict)) and 
+    len(options) == 2 and 
+    any(
+        x == "True" or (isinstance(x, str) and re.match(r"(?i)^yes", x.strip()))
+        for x in (options if isinstance(options, list) else options.values())
+    )
+)
+
     # Check for matching format
     matching_patterns = [
         r'match.*with', r'match.*to', r'matching',
